@@ -1,0 +1,35 @@
+#include <Wire.h>
+#include <MPU6050_tockn.h>
+#include <VirtualWire.h>
+
+const int tx = 2;
+struct {
+int X;
+int Y;
+int Z;
+} DATA;
+MPU6050 mpu6050(Wire);
+void setup() {
+
+Serial.begin(9600);
+Wire.begin();
+mpu6050.begin();
+
+mpu6050.calcGyroOffsets(true);
+vw_set_tx_pin(tx);
+vw_setup(4000);
+}
+void loop() {
+mpu6050.update();
+Serial.print("angleX : ");
+DATA.X = mpu6050.getAngleX();
+Serial.println(DATA.X);
+Serial.print("angleY : ");
+DATA.Y = mpu6050.getAngleY();
+Serial.println(DATA.Y);
+Serial.print("angleZ : ");
+DATA.Z= mpu6050.getAngleZ();
+Serial.println(DATA.Z);
+vw_send((uint8_t*)&DATA, sizeof(DATA));
+vw_wait_tx();
+}
